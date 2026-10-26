@@ -1,0 +1,622 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Bağlaç Haritası</title>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Libre+Franklin:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* Düzen: anlam ailesi blokları; her blok içinde tür kartları (bağlaç / edat / cümle zarfı / ikili) yan yana, dar ekranda alt alta */
+:root{
+  --paper:#f0f2f6; --surface:#ffffff; --sunk:#e7eaf1;
+  --ink:#141a27; --muted:#5d6782; --rule:#d5dae5;
+  --act:#1d2740; --on-act:#ffffff;
+  --baglac:#2a46c4; --baglac-bg:#e5e9ff;
+  --edat:#a85209;  --edat-bg:#fbeedc;
+  --zarf:#0a6f62;  --zarf-bg:#dbf0ec;
+  --ikili:#79348f; --ikili-bg:#f3e5fa;
+  --ok:#1f6b45; --ok-bg:#def0e6;
+  --no:#a62f22; --no-bg:#fae5e1;
+  --disp:"Fraunces",Georgia,serif;
+  --body:"Libre Franklin","Segoe UI",system-ui,sans-serif;
+  --mono:"JetBrains Mono",ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --paper:#0d1118; --surface:#161b25; --sunk:#1e2533;
+  --ink:#e6eaf2; --muted:#98a3bb; --rule:#2a3243;
+  --act:#dfe5f2; --on-act:#111725;
+  --baglac:#93a6ff; --baglac-bg:#1a2049;
+  --edat:#eba763;  --edat-bg:#372512;
+  --zarf:#4fc3b0;  --zarf-bg:#0d2f2b;
+  --ikili:#cb93e6; --ikili-bg:#2b1a38;
+  --ok:#5fc08c; --ok-bg:#132c1f;
+  --no:#ef8f7e; --no-bg:#321915;
+  color-scheme:dark;
+}}
+:root[data-theme="dark"]{
+  --paper:#0d1118; --surface:#161b25; --sunk:#1e2533;
+  --ink:#e6eaf2; --muted:#98a3bb; --rule:#2a3243;
+  --act:#dfe5f2; --on-act:#111725;
+  --baglac:#93a6ff; --baglac-bg:#1a2049;
+  --edat:#eba763;  --edat-bg:#372512;
+  --zarf:#4fc3b0;  --zarf-bg:#0d2f2b;
+  --ikili:#cb93e6; --ikili-bg:#2b1a38;
+  --ok:#5fc08c; --ok-bg:#132c1f;
+  --no:#ef8f7e; --no-bg:#321915;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{background:var(--paper);color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.55;-webkit-text-size-adjust:100%}
+button{font:inherit;color:inherit;cursor:pointer}
+:focus-visible{outline:2px solid var(--act);outline-offset:2px;border-radius:4px}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+.wrap{max-width:860px;margin:0 auto;padding-inline:16px;padding-block:0 60px}
+
+/* başlık */
+header.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:30;background:var(--paper);border-bottom:1px solid var(--rule)}
+.top-in{max-width:860px;margin:0 auto;padding-inline:16px;padding-block:11px 0}
+.brand{display:flex;align-items:baseline;gap:12px;justify-content:space-between;flex-wrap:wrap}
+h1{font-family:var(--disp);font-size:1.4rem;font-weight:600;margin:0;letter-spacing:-.015em}
+.count{font-family:var(--mono);font-size:.7rem;color:var(--muted);letter-spacing:.02em;font-variant-numeric:tabular-nums}
+.tabs{display:flex;gap:4px;margin-top:9px}
+.tab{background:none;border:0;border-bottom:2px solid transparent;padding:7px 13px 9px;color:var(--muted);font-size:.87rem;font-weight:500;white-space:nowrap}
+.tab[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--act)}
+
+/* tür rozetleri */
+.t{font-family:var(--mono);font-size:.6rem;letter-spacing:.08em;text-transform:uppercase;padding:2px 6px;border-radius:3px;white-space:nowrap;font-weight:500}
+.t-baglac{color:var(--baglac);background:var(--baglac-bg)}
+.t-edat{color:var(--edat);background:var(--edat-bg)}
+.t-zarf{color:var(--zarf);background:var(--zarf-bg)}
+.t-ikili{color:var(--ikili);background:var(--ikili-bg)}
+
+/* kural kartı */
+.rules{background:var(--surface);border:1px solid var(--rule);border-radius:12px;padding:18px;margin-top:20px}
+.rules h2{font-family:var(--disp);font-size:1.08rem;font-weight:600;margin:0 0 4px}
+.rules .sub{color:var(--muted);font-size:.84rem;margin:0 0 14px}
+.rul{display:grid;grid-template-columns:auto 1fr;gap:9px 12px;align-items:start}
+.rul .q{font-size:.86rem;padding-top:1px}
+.rul .a{display:flex;flex-direction:column;gap:2px;min-width:0}
+.rul code{font-family:var(--mono);font-size:.76rem;color:var(--muted);word-break:break-word}
+.rul .line{display:flex;align-items:center;gap:7px;flex-wrap:wrap}
+.arrow{color:var(--muted)}
+
+/* aile filtresi */
+.filters{display:flex;gap:5px;flex-wrap:wrap;margin:22px 0 14px}
+.fchip{border:1px solid var(--rule);background:var(--surface);border-radius:99px;padding:4px 11px;font-size:.78rem;color:var(--muted)}
+.fchip[aria-pressed="true"]{background:var(--act);border-color:var(--act);color:var(--on-act)}
+
+/* aile bloğu */
+.fam{margin-bottom:30px}
+.fam-hd{display:flex;align-items:baseline;gap:10px;padding-bottom:7px;border-bottom:2px solid var(--ink);margin-bottom:13px;flex-wrap:wrap}
+.fam-hd h3{font-family:var(--disp);font-size:1.22rem;font-weight:600;margin:0;letter-spacing:-.01em}
+.fam-hd .gl{color:var(--muted);font-size:.82rem}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(246px,1fr));gap:11px}
+.g{background:var(--surface);border:1px solid var(--rule);border-radius:10px;padding:13px 14px;border-top:3px solid var(--rule);min-width:0;display:flex;flex-direction:column;gap:7px}
+.g.k-baglac{border-top-color:var(--baglac)}
+.g.k-edat{border-top-color:var(--edat)}
+.g.k-zarf{border-top-color:var(--zarf)}
+.g.k-ikili{border-top-color:var(--ikili)}
+.g.starred{box-shadow:inset 3px 0 0 var(--edat)}
+.g-top{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.star{background:none;border:0;padding:1px 3px;color:var(--rule);font-size:.95rem;line-height:1}
+.star[aria-pressed="true"]{color:var(--edat)}
+.forms{display:flex;flex-wrap:wrap;gap:4px}
+.f{font-family:var(--disp);font-size:1rem;font-weight:600;background:var(--sunk);border-radius:5px;padding:1px 7px;line-height:1.45}
+.g .ttl{font-family:var(--disp);font-size:1.02rem;font-weight:600;line-height:1.3}
+.g .mean{font-size:.88rem}
+.pat{font-family:var(--mono);font-size:.72rem;color:var(--muted);background:var(--sunk);border-radius:4px;padding:3px 7px;align-self:flex-start;max-width:100%;overflow-x:auto;white-space:nowrap}
+.ex{border-left:2px solid var(--rule);padding-left:10px;font-size:.87rem}
+.ex b{font-weight:600}
+.ex .en b{padding:0 1px;border-bottom:2px solid currentColor}
+.ex .tn{color:var(--muted);font-size:.82rem;margin-top:1px}
+.note{font-size:.81rem;color:var(--muted);border-top:1px dotted var(--rule);padding-top:7px}
+.note strong{color:var(--ink);font-weight:600}
+
+/* alıştırma */
+.sect{margin-top:22px}
+.lead{color:var(--muted);font-size:.85rem;margin:0 0 15px;max-width:60ch}
+.picks{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:10px}
+.pick{text-align:left;background:var(--surface);border:1px solid var(--rule);border-radius:10px;padding:14px;display:flex;flex-direction:column;gap:4px}
+.pick:hover{border-color:var(--act)}
+.pick b{font-family:var(--disp);font-size:1.02rem;font-weight:600}
+.pick span{font-size:.82rem;color:var(--muted)}
+.bar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:14px}
+.btn{border:1px solid var(--rule);background:var(--surface);border-radius:7px;padding:7px 13px;font-size:.84rem}
+.btn.go{background:var(--act);border-color:var(--act);color:var(--on-act)}
+.num{font-family:var(--mono);font-size:.74rem;color:var(--muted);font-variant-numeric:tabular-nums}
+.q{background:var(--surface);border:1px solid var(--rule);border-radius:12px;padding:18px}
+.qk{font-family:var(--mono);font-size:.62rem;letter-spacing:.09em;text-transform:uppercase;color:var(--muted)}
+.qt{font-family:var(--disp);font-size:1.14rem;line-height:1.5;margin:9px 0 16px;text-wrap:balance}
+.qt .blank{font-family:var(--mono);color:var(--act);letter-spacing:-.04em}
+.qt .hi{background:var(--sunk);border-radius:4px;padding:0 5px}
+.opts{display:flex;flex-direction:column;gap:7px}
+.o{text-align:left;border:1px solid var(--rule);background:var(--sunk);border-radius:8px;padding:9px 12px;font-size:.93rem;display:flex;gap:9px;align-items:baseline}
+.o .k{font-family:var(--mono);font-size:.72rem;color:var(--muted)}
+.o:hover:not(:disabled){border-color:var(--act)}
+.o.right{background:var(--ok-bg);border-color:var(--ok)}
+.o.wrong{background:var(--no-bg);border-color:var(--no)}
+.o:disabled{cursor:default}
+.fb{margin-top:15px;padding-top:13px;border-top:1px solid var(--rule);font-size:.88rem;display:flex;flex-direction:column;gap:8px}
+.fb .vd{font-weight:600}
+.fb .vd.r{color:var(--ok)} .fb .vd.w{color:var(--no)}
+.score{text-align:center;background:var(--surface);border:1px solid var(--rule);border-radius:12px;padding:30px 18px}
+.score .n{font-family:var(--disp);font-size:2.9rem;line-height:1;font-variant-numeric:tabular-nums}
+.missed{margin-top:18px;text-align:left;display:flex;flex-direction:column;gap:7px}
+.mrow{display:flex;justify-content:space-between;gap:10px;font-size:.87rem;border-bottom:1px dotted var(--rule);padding-bottom:6px;flex-wrap:wrap}
+.mrow span{color:var(--muted)}
+.empty{text-align:center;color:var(--muted);padding:44px 16px;font-size:.9rem;max-width:46ch;margin:0 auto}
+footer{margin-top:36px;padding-top:15px;border-top:1px solid var(--rule);color:var(--muted);font-size:.78rem}
+</style>
+
+<header class="top">
+  <div class="top-in">
+    <div class="brand">
+      <h1>Bağlaç Haritası</h1>
+      <div class="count" id="count">—</div>
+    </div>
+    <div class="tabs" role="tablist" id="tabs"></div>
+  </div>
+</header>
+<div class="wrap"><div id="view"></div>
+  <footer>İşaretlemeler bu tarayıcıda saklanır. Yapılar Gürcan &amp; Gürbüz gramer tablolarından alınmıştır.</footer>
+</div>
+
+<script>
+const T={
+ baglac:{lb:"Bağlaç",pat:"+ özne + fiil (tam cümle)"},
+ edat:{lb:"Edat",pat:"+ isim / V-ing"},
+ zarf:{lb:"Cümle zarfı",pat:"; ... , veya . ... ,"},
+ ikili:{lb:"İkili yapı",pat:"iki parçası birlikte"}
+};
+/* çok rollü kelimeler: yanlış şık olarak asla kullanılmaz */
+const AMBIG=new Set(["while","as","since","for","so","but","that is","before","after","however","besides","once","then","yet","or","such","given","considering","immediately","not ... but"]);
+
+const FAM=[
+{id:"fant",name:"Temel bağlaçlar (FANTBOYS)",gl:"iki bağımsız cümleyi virgülle bağlar",groups:[
+ {ty:"baglac",mean:"çünkü",forms:["for"],pat:"cümle, for cümle",
+  ex:{en:"The experiment was repeated, {{for}} the first results seemed unreliable.",tr:"Deney tekrarlandı, çünkü ilk sonuçlar güvenilmez görünüyordu."},
+  note:"<strong>because</strong> ile aynı anlam ama cümle başına gelemez; hep ikinci cümleyi bağlar."},
+ {ty:"baglac",mean:"ve",forms:["and"],pat:"cümle, and cümle",
+  ex:{en:"The samples were collected, {{and}} the results were published within a month.",tr:"Örnekler toplandı ve sonuçlar bir ay içinde yayımlandı."},
+  note:"İki bağımsız cümleyi bağlarken önüne virgül gelir."},
+ {ty:"baglac",mean:"ne de",forms:["nor"],pat:"cümle, nor + yardımcı fiil + özne",
+  ex:{en:"She did not comment on the report, {{nor}} did she deny its findings.",tr:"Raporu yorumlamadı, bulgularını da yalanlamadı."},
+  note:"<strong>nor</strong> sonrasında devrik yapı şarttır: yardımcı fiil özneden önce gelir."},
+ {ty:"baglac",mean:"fakat, ama",forms:["but","yet"],pat:"cümle, but/yet cümle",
+  ex:{en:"The theory is elegant, {{yet}} it fails to explain the data.",tr:"Kuram zarif ama verileri açıklayamıyor."},
+  note:"<strong>yet</strong> burada “fakat” demektir; zaman zarfı olarak “henüz” anlamıyla karıştırma."},
+ {ty:"baglac",mean:"veya; yoksa",forms:["or"],pat:"cümle, or cümle",
+  ex:{en:"Submit the form today, {{or}} you will lose your place on the course.",tr:"Formu bugün teslim et, yoksa kurstaki yerini kaybedersin."},
+  note:"Emir cümlesinden sonra “yoksa” anlamına kayar ve <strong>otherwise</strong> ile eşdeğer olur."},
+ {ty:"baglac",mean:"bu yüzden",forms:["so"],pat:"cümle, so cümle",
+  ex:{en:"The main road was blocked, {{so}} the convoy took a longer route.",tr:"Ana yol kapalıydı, bu yüzden konvoy daha uzun bir rota izledi."},
+  note:"Sonuç bildirir. <strong>so that</strong> ile karıştırma: o, amaç bildirir."},
+ {ty:"baglac",mean:"sonra, o zaman",forms:["then"],pat:"cümle, then cümle",
+  ex:{en:"Finish the analysis first, {{then}} send the draft to the editor.",tr:"Önce analizi bitir, sonra taslağı editöre gönder."},
+  note:"Sıra bildirir; cümle zarfı olarak da kullanılabilir."}
+]},
+
+{id:"paralel",name:"Paralel (ikili) yapılar",gl:"iki tarafında aynı tür yapı bulunur",groups:[
+ {ty:"ikili",mean:"sadece ... değil, ayrıca ...",forms:["not only"],ttl:"not only ... but (also) ...",pat:"Not only + devrik , but (also) ...",
+  ex:{en:"{{Not only}} did the policy fail, but it also made the shortage worse.",tr:"Politika sadece başarısız olmakla kalmadı, kıtlığı da ağırlaştırdı."},
+  note:"Cümle <strong>başında</strong> kullanılırsa devrik olur: Not only <strong>did</strong> the policy fail. Ortada kullanılırsa devrik olmaz."},
+ {ty:"ikili",mean:"hem ... hem de ...",forms:["both"],ttl:"both ... and ...",pat:"both A and B",
+  ex:{en:"The method is {{both}} reliable and inexpensive.",tr:"Yöntem hem güvenilir hem de ucuz."},
+  note:"İki taraf aynı türden olmalı: both + sıfat/sıfat, both + isim/isim. Fiil her zaman çoğuldur."},
+ {ty:"ikili",mean:"ya ... ya da ...",forms:["either"],ttl:"either ... or ...",pat:"either A or B",
+  ex:{en:"Candidates may {{either}} submit a portfolio or sit a written exam.",tr:"Adaylar ya bir portföy sunabilir ya da yazılı sınava girebilir."},
+  note:"Fiil, <strong>en yakın</strong> özneye uyar: Either the students or the teacher <strong>is</strong> wrong."},
+ {ty:"ikili",mean:"ne ... ne de ...",forms:["neither"],ttl:"neither ... nor ...",pat:"neither A nor B",
+  ex:{en:"{{Neither}} the author nor the editor noticed the error.",tr:"Ne yazar ne de editör hatayı fark etti."},
+  note:"Zaten olumsuzdur, ikinci bir olumsuzluk eklenmez. Fiil en yakın özneye uyar."},
+ {ty:"ikili",mean:"... değil, ... dır",forms:["not ... but"],ttl:"not ... but ...",pat:"not A but B",
+  ex:{en:"The real obstacle is {{not}} the design but the cost of implementation.",tr:"Asıl engel tasarım değil, uygulama maliyetidir."},
+  note:"Düzeltme bildirir: yanlış olanı reddedip doğrusunu koyar."}
+]},
+
+{id:"zitlik",name:"Zıtlık",gl:"-e rağmen, fakat, yine de",groups:[
+ {ty:"baglac",sn:"ragmen",mean:"-e rağmen, -sa da, -se bile",forms:["although","even though","though","even if","much as","despite the fact that","in spite of the fact that"],pat:"Although + özne + fiil , ana cümle",
+  ex:{en:"{{Although}} the sample was small, the results proved remarkably consistent.",tr:"Örneklem küçük olmasına rağmen sonuçlar dikkat çekici biçimde tutarlı çıktı."},
+  note:"Bunlardan sonra <strong>tam cümle</strong> gelir. <strong>even if</strong> farkı: gerçekleşmemiş bir varsayım kurar (-se bile)."},
+ {ty:"baglac",mean:"iken, oysaki (karşılaştırma)",forms:["whereas","while"],pat:"cümle , whereas cümle",
+  ex:{en:"Urban wages rose sharply, {{whereas}} rural incomes stagnated.",tr:"Kentsel ücretler keskin biçimde arttı, oysa kırsal gelirler yerinde saydı."},
+  note:"İki durumu <strong>yan yana koyup karşılaştırır</strong>; although gibi “rağmen” değildir."},
+ {ty:"edat",sn:"ragmen",mean:"-e rağmen, -e karşın",forms:["despite","in spite of","notwithstanding"],pat:"Despite + isim / V-ing",
+  ex:{en:"{{Despite}} repeated warnings, the company continued production.",tr:"Tekrarlanan uyarılara rağmen şirket üretimi sürdürdü."},
+  note:"EN SIK HATA: <strong>despite of</strong> diye bir şey yoktur. Cümle bağlamak için “despite <strong>the fact that</strong>” gerekir."},
+ {ty:"baglac",mean:"ne kadar ... olursa olsun",forms:["however","no matter how"],ttl:"however / no matter how + sıfat/zarf",pat:"However + sıfat/zarf + özne + fiil",
+  ex:{en:"{{However}} carefully you plan, some risks will always remain.",tr:"Ne kadar dikkatli plan yaparsan yap, bazı riskler hep kalır."},
+  note:"TUZAK: <strong>however</strong> sıfat/zarf alırsa bağlaçtır; tek başına virgülle gelirse cümle zarfıdır (“fakat”)."},
+ {ty:"zarf",sn:"ragmen",mean:"fakat, yine de, buna rağmen",forms:["however","still","even so","nonetheless","nevertheless","all the same"],pat:"cümle ; however , cümle",
+  ex:{en:"The evidence was weak; {{nevertheless}}, the claim was widely accepted.",tr:"Kanıtlar zayıftı; yine de iddia geniş kabul gördü."},
+  note:"Cümle bağlamaz. Öncesinde <strong>nokta veya noktalı virgül</strong>, sonrasında virgül ister."},
+ {ty:"zarf",sn:"aksine",mean:"aksine, diğer yandan",forms:["conversely","on the other hand","in contrast","by contrast"],pat:"cümle ; in contrast , cümle",
+  ex:{en:"Costs would fall sharply; {{on the other hand}}, quality might suffer.",tr:"Maliyetler keskin biçimde düşerdi; diğer yandan kalite zarar görebilirdi."},
+  note:"İki seçeneğin karşıt yüzünü gösterir; bir iddiayı çürütmez."},
+ {ty:"edat",sn:"aksine",mean:"-nin aksine, -den farklı olarak",forms:["in contrast to","in contrast with","unlike","contrary to"],pat:"Unlike + isim , cümle",
+  ex:{en:"{{Unlike}} its predecessor, the new model runs almost silently.",tr:"Selefinden farklı olarak yeni model neredeyse sessiz çalışıyor."},
+  note:"Ardından isim gelir. <strong>contrary to</strong> çoğu zaman bir beklentiyi yanlışlar: contrary to expectations."},
+ {ty:"zarf",mean:"aksine, bilakis (çürütme)",forms:["on the contrary"],pat:"cümle ; on the contrary , cümle",
+  ex:{en:"The drug did not relieve the pain; {{on the contrary}}, it intensified it.",tr:"İlaç ağrıyı dindirmedi; aksine şiddetlendirdi."},
+  note:"Önceki cümle <strong>olumsuz</strong> olmalı: söyleneni reddedip tersini söyler. “on the other hand” ile aynı şey değildir."}
+]},
+
+{id:"sebep",name:"Sebep",gl:"-dığı için, çünkü",groups:[
+ {ty:"baglac",sn:"sebep",mean:"-dığı için, çünkü",forms:["because","since","as","seeing that","seeing as","inasmuch as"],pat:"Because + özne + fiil , ana cümle",
+  ex:{en:"{{Since}} the funding was withdrawn, the project was quietly abandoned.",tr:"Fon çekildiği için proje sessizce terk edildi."},
+  note:"<strong>since</strong> ve <strong>as</strong> zaman anlamı da taşır; hangisi olduğunu cümlenin mantığı belirler."},
+ {ty:"baglac",mean:"-dığı gerekçesiyle",forms:["on the grounds that"],pat:"on the grounds that + özne + fiil",
+  ex:{en:"The appeal was rejected {{on the grounds that}} it had been filed too late.",tr:"İtiraz, çok geç sunulduğu gerekçesiyle reddedildi."},
+  note:"Resmî gerekçe bildirir; hukuk ve kurum metinlerinde sık geçer."},
+ {ty:"baglac",mean:"madem ki, artık ... olduğuna göre",forms:["now that"],pat:"Now that + özne + fiil",
+  ex:{en:"{{Now that}} the data are publicly available, anyone can verify the claim.",tr:"Veriler artık kamuya açık olduğuna göre iddiayı herkes doğrulayabilir."},
+  note:"Yeni ortaya çıkmış bir durumu gerekçe yapar: “artık öyle olduğuna göre”."},
+ {ty:"baglac",mean:"şu bakımdan ki, şu açıdan",forms:["in that"],pat:"cümle + in that + özne + fiil",
+  ex:{en:"The study is unusual {{in that}} it follows the same participants for forty years.",tr:"Çalışma, aynı katılımcıları kırk yıl izlemesi bakımından sıra dışıdır."},
+  note:"Sebepten çok <strong>hangi açıdan</strong> olduğunu açar: “şu bakımdan ki”."},
+ {ty:"edat",sn:"sebep",mean:"-den dolayı, yüzünden",forms:["because of","due to","owing to","on account of","in view of","as a result of","as a consequence of"],pat:"Because of + isim / V-ing",
+  ex:{en:"Dozens of flights were cancelled {{owing to}} dense fog over the capital.",tr:"Başkent üzerindeki yoğun sis yüzünden onlarca uçuş iptal edildi."},
+  note:"Ardından <strong>isim</strong> gelir, cümle gelmez. because (bağlaç) ile because of (edat) ayrımı en sık sorulan şeydir."},
+ {ty:"edat",mean:"-nin sayesinde",forms:["thanks to"],pat:"Thanks to + isim",
+  ex:{en:"{{Thanks to}} early detection, the disease was treated successfully.",tr:"Erken teşhis sayesinde hastalık başarıyla tedavi edildi."},
+  note:"Diğer sebep edatlarından farkı: sonuç <strong>olumludur</strong>. Olumsuz sonuçta kullanılmaz."}
+]},
+
+{id:"sonuc",name:"Sonuç",gl:"bu yüzden, o kadar ... ki",groups:[
+ {ty:"ikili",mean:"o kadar ... ki",forms:["so"],ttl:"so + sıfat/zarf + that ...",pat:"so + adj/adv + that + özne + fiil",
+  ex:{en:"The instructions were {{so}} vague that nobody could follow them.",tr:"Talimatlar o kadar muğlaktı ki kimse uygulayamadı."},
+  note:"Arasına <strong>sıfat veya zarf</strong> girer. Araya isim giriyorsa such kullanılır."},
+ {ty:"ikili",mean:"öyle bir ... ki",forms:["such"],ttl:"such + (a) sıfat + isim + that ...",pat:"such + (a/an) + adj + noun + that + özne + fiil",
+  ex:{en:"It was {{such}} a complex argument that very few readers grasped it.",tr:"Öyle karmaşık bir argümandı ki çok az okur kavradı."},
+  note:"Ayrım tek kelimeyle: araya <strong>isim</strong> giriyorsa such, girmiyorsa so."},
+ {ty:"zarf",mean:"bu yüzden, sonuç olarak",forms:["therefore","thus","hence","accordingly","consequently","as a consequence","as a result"],pat:"cümle ; therefore , cümle",
+  ex:{en:"The data were incomplete; {{therefore}}, the conclusions must be treated with caution.",tr:"Veriler eksikti; bu yüzden sonuçlara ihtiyatla yaklaşılmalı."},
+  note:"Cümle bağlamaz. Aynı işi bağlaç olarak <strong>so</strong>, edat olarak <strong>as a result of</strong> yapar."},
+ {ty:"zarf",mean:"böylece, bu suretle",forms:["thereby"],pat:"cümle , thereby + V-ing",
+  ex:{en:"The valve closes automatically, {{thereby}} preventing any leak.",tr:"Vana otomatik kapanır, böylece sızıntıyı önler."},
+  note:"Ardından neredeyse her zaman <strong>V-ing</strong> gelir; ayrı bir cümle değil."},
+ {ty:"zarf",mean:"aksi takdirde, yoksa",forms:["otherwise"],pat:"cümle ; otherwise , cümle",
+  ex:{en:"Back up the archive today; {{otherwise}}, you risk losing twenty years of records.",tr:"Arşivi bugün yedekle; aksi takdirde yirmi yıllık kaydı kaybetme riskin var."},
+  note:"Gizli bir koşul taşır: “yapmazsan şu olur”. Emir cümlesinden sonra <strong>or</strong> ile aynı işi görür."}
+]},
+
+{id:"amac",name:"Amaç",gl:"-mek için, -sin diye",groups:[
+ {ty:"baglac",mean:"-sin diye, -mek için",forms:["so that","in order that"],pat:"so that + özne + can/could/will/would + fiil",
+  ex:{en:"The session was recorded {{so that}} absent members could listen to it later.",tr:"Oturum, katılamayan üyeler sonradan dinleyebilsin diye kaydedildi."},
+  note:"Genellikle <strong>can, could, will, would, may</strong> ile gelir. Özne aynıysa “in order to + fiil” daha kısadır."},
+ {ty:"baglac",mean:"-mesin diye, korkusuyla",forms:["lest","for fear that"],pat:"lest + özne + yalın fiil / should",
+  ex:{en:"He spoke in a whisper {{lest}} the sleeping children should wake.",tr:"Uyuyan çocuklar uyanmasın diye fısıltıyla konuştu."},
+  note:"Olumsuz amaç bildirir ve kendisi zaten olumsuzdur: içine <strong>not</strong> konmaz. Ardından yalın fiil veya should gelir."}
+]},
+
+{id:"zaman",name:"Zaman",gl:"-dığında, -den önce, -e kadar",groups:[
+ {ty:"baglac",mean:"-den sonra / -meden önce",forms:["after","before"],pat:"After + özne + fiil  ·  After + isim / V-ing",
+  ex:{en:"{{Before}} the law was passed, such practices were entirely common.",tr:"Yasa çıkmadan önce bu tür uygulamalar son derece yaygındı."},
+  note:"Hem bağlaç hem edattır: cümle de isim de alabilir (before the meeting / before the meeting began)."},
+ {ty:"baglac",mean:"-dığında, -iken",forms:["when","while","as"],pat:"When + özne + fiil , ana cümle",
+  ex:{en:"{{While}} the data were being collected, two senior researchers resigned.",tr:"Veriler toplanırken iki kıdemli araştırmacı istifa etti."},
+  note:"<strong>while</strong> süren bir eylemle (genelde -ing), <strong>when</strong> bir anla kullanılır."},
+ {ty:"baglac",mean:"...ır ...maz, hemen ardından",forms:["as soon as","the moment","the minute","immediately"],pat:"As soon as + özne + fiil , ana cümle",
+  ex:{en:"{{As soon as}} the results arrived, the team published them online.",tr:"Sonuçlar gelir gelmez ekip onları internette yayımladı."},
+  note:"Zaman bağlaçlarından sonra <strong>will kullanılmaz</strong>; gelecek için geniş zaman gelir."},
+ {ty:"baglac",mean:"bir kez ...ınca, ...dıktan sonra",forms:["once"],pat:"Once + özne + fiil , ana cümle",
+  ex:{en:"{{Once}} the vaccine was approved, demand rose beyond all forecasts.",tr:"Aşı bir kez onaylanınca talep tüm tahminleri aştı."},
+  note:"“Bir kez olduktan sonra artık” anlamı taşır; tamamlanmışlık vurgular."},
+ {ty:"baglac",mean:"-e kadar, o ana dek",forms:["until","till"],pat:"ana cümle + until + özne + fiil",
+  ex:{en:"The ban remained in force {{until}} the court finally overturned it.",tr:"Yasak, mahkeme nihayet onu bozana kadar yürürlükte kaldı."},
+  note:"Süreklilik bildirir. “o zamana kadar” noktasını anlatan <strong>by the time</strong> ile karıştırma."},
+ {ty:"baglac",mean:"-e kadar, -dığı zamana dek",forms:["by the time"],pat:"By the time + özne + fiil , ana cümle (perfect)",
+  ex:{en:"{{By the time}} help arrived, the fire had destroyed the entire archive.",tr:"Yardım geldiğinde yangın tüm arşivi yok etmişti."},
+  note:"Ana cümlede neredeyse her zaman <strong>perfect</strong> zaman bulunur: had destroyed, will have finished."},
+ {ty:"baglac",mean:"tam ...iken",forms:["just as"],pat:"Just as + özne + fiil , ana cümle",
+  ex:{en:"{{Just as}} the ceremony began, the power failed across the building.",tr:"Tören tam başlarken binanın elektriği kesildi."},
+  note:"İki olayın <strong>tam aynı ana</strong> denk geldiğini vurgular."},
+ {ty:"baglac",mean:"her ...dığında",forms:["whenever","every time","each time"],pat:"Whenever + özne + fiil , ana cümle",
+  ex:{en:"{{Whenever}} prices rise above a certain level, consumption falls sharply.",tr:"Fiyatlar belli bir seviyenin üstüne her çıktığında tüketim keskin biçimde düşer."},
+  note:"Tekrarlanan durum bildirir; genelde iki tarafta da geniş zaman kullanılır."},
+ {ty:"baglac",mean:"son/ilk/gelecek sefer ...dığında",forms:["the last time","the next time","the first time"],pat:"The last time + özne + fiil , ana cümle",
+  ex:{en:"{{The last time}} the volcano erupted, the island was still uninhabited.",tr:"Yanardağ en son patladığında ada hâlâ ıssızdı."},
+  note:"Bu kalıplar bağlaç gibi çalışır; ardından doğrudan cümle gelir, “when” eklenmez."},
+ {ty:"ikili",mean:"...ır ...maz (devrik)",forms:["no sooner"],ttl:"No sooner ... than ...",pat:"No sooner + had + özne + V3 + than + cümle",
+  ex:{en:"{{No sooner}} had the report appeared than critics began to attack it.",tr:"Rapor yayımlanır yayımlanmaz eleştirmenler saldırmaya başladı."},
+  note:"İki kural birden: cümle başında <strong>devrik</strong> olur ve eşi mutlaka <strong>than</strong>'dir, when değil."},
+ {ty:"ikili",mean:"...ır ...maz (devrik)",forms:["hardly","scarcely","barely"],ttl:"Hardly ... when ...",pat:"Hardly + had + özne + V3 + when + cümle",
+  ex:{en:"{{Hardly}} had the meeting started when the fire alarm went off.",tr:"Toplantı başlar başlamaz yangın alarmı çaldı."},
+  note:"No sooner'ın aynadaki eşi ama eşi <strong>when</strong>'dir, than değil. YDS bu çifti düzenli olarak sorar."},
+ {ty:"zarf",mean:"bu sırada, bu esnada",forms:["meanwhile","in the meantime"],pat:"cümle . Meanwhile , cümle",
+  ex:{en:"Negotiations dragged on for weeks; {{meanwhile}}, the strike spread to other cities.",tr:"Müzakereler haftalarca sürdü; bu sırada grev başka şehirlere yayıldı."},
+  note:"Aynı anda süren ikinci bir olayı anlatır; cümle bağlamaz."},
+ {ty:"zarf",mean:"ilk başta / daha sonra",forms:["at first","initially","afterwards","subsequently"],pat:"At first , cümle",
+  ex:{en:"{{At first}}, the symptoms seemed mild enough to ignore.",tr:"İlk başta belirtiler göz ardı edilecek kadar hafif görünüyordu."},
+  note:"Anlatı sırası kurar. Genelde ardından “but later / afterwards” ile dönüş gelir."}
+]},
+
+{id:"durum",name:"Durum ve benzerlik",gl:"-dığı gibi, -mış gibi",groups:[
+ {ty:"baglac",mean:"-dığı gibi, tıpkı ... gibi",forms:["just as"],pat:"Just as + cümle , so + cümle",
+  ex:{en:"{{Just as}} climate shapes agriculture, agriculture in turn reshapes the climate.",tr:"İklim tarımı biçimlendirdiği gibi, tarım da iklimi yeniden biçimlendirir."},
+  note:"Zaman anlamındaki “tam ...iken” kullanımından farklıdır; burada iki olgu <strong>benzetilir</strong>."},
+ {ty:"baglac",mean:"-mış gibi, sanki",forms:["as if","as though"],pat:"as if + özne + past / past perfect",
+  ex:{en:"He described the city {{as if}} he had lived there for decades.",tr:"Şehri sanki orada onlarca yıl yaşamış gibi anlattı."},
+  note:"Gerçek dışı bir durumda <strong>bir zaman geriye</strong> gidilir: as if he <strong>were</strong>, as if he <strong>had</strong> lived."}
+]},
+
+{id:"yargi",name:"Öznel yargı",gl:"-i düşünürsek, -dığı kadarıyla",groups:[
+ {ty:"baglac",sn:"yargi",mean:"-mesi dikkate alınırsa",forms:["given that","considering that"],pat:"Given that + özne + fiil , ana cümle",
+  ex:{en:"{{Given that}} the sample was so small, the findings are hardly conclusive.",tr:"Örneklemin bu kadar küçük olduğu düşünülürse bulgular pek de kesin sayılmaz."},
+  note:"Bilinen bir olguyu dayanak yapar ve ondan bir yargı çıkarır."},
+ {ty:"edat",sn:"yargi",mean:"-i düşünürsek, -e göre",forms:["given","considering"],pat:"Considering + isim / V-ing",
+  ex:{en:"{{Considering}} its age, the manuscript is in remarkable condition.",tr:"Yaşını düşünürsek el yazması dikkat çekici durumda."},
+  note:"<strong>that</strong> düşünce cümle, düşmezse isim alır. Tek kelimelik fark tür değiştirir."},
+ {ty:"baglac",mean:"-dığı kadarıyla",forms:["as far as","so far as"],pat:"As far as + özne + fiil , ana cümle",
+  ex:{en:"{{As far as}} we know, no comparable case has ever been recorded.",tr:"Bildiğimiz kadarıyla benzer bir vaka hiç kaydedilmedi."},
+  note:"Kalıplaşmış hâlleri: as far as I know, as far as I am concerned, as far as the data show."}
+]},
+
+{id:"ekleme",name:"Ekleme",gl:"ayrıca, -nin yanı sıra",groups:[
+ {ty:"zarf",sn:"ekleme",mean:"ayrıca, dahası, buna ek olarak",forms:["moreover","furthermore","in addition","what is more","further","also"],pat:"cümle ; moreover , cümle",
+  ex:{en:"The design is costly to build; {{moreover}}, it is extremely difficult to maintain.",tr:"Tasarımın inşası pahalı; dahası bakımı son derece zor."},
+  note:"Aynı yöndeki ikinci bir argümanı ekler. Cümle bağlamaz."},
+ {ty:"edat",sn:"ekleme",mean:"-nin yanı sıra, -e ek olarak",forms:["in addition to","apart from","as well as","aside from","besides"],pat:"In addition to + isim / V-ing",
+  ex:{en:"{{In addition to}} teaching, she supervises twelve doctoral students.",tr:"Ders vermenin yanı sıra on iki doktora öğrencisine danışmanlık yapıyor."},
+  note:"TUZAK: <strong>besides</strong> hem edattır (yanı sıra) hem cümle zarfıdır (ayrıca). Ardından ne geldiğine bak."},
+ {ty:"edat",mean:"ile birlikte",forms:["along with","together with","alongside","coupled with"],pat:"isim , along with + isim , fiil",
+  ex:{en:"The letters, {{along with}} several photographs, were donated to the national archive.",tr:"Mektuplar, birkaç fotoğrafla birlikte ulusal arşive bağışlandı."},
+  note:"Fiil <strong>asıl özneye</strong> uyar, araya giren isme değil: The manager, along with his aides, <strong>was</strong> late."}
+]},
+
+{id:"aciklama",name:"Açıklama ve örnekleme",gl:"örneğin, yani, özellikle",groups:[
+ {ty:"zarf",mean:"örneğin",forms:["for instance","for example","to illustrate"],pat:"cümle , for instance , cümle",
+  ex:{en:"Some metals, {{for instance}} copper, conduct heat with remarkable efficiency.",tr:"Bazı metaller, örneğin bakır, ısıyı dikkat çekici bir verimlilikle iletir."},
+  note:"Genel bir ifadeden tek bir örneğe iner."},
+ {ty:"zarf",mean:"özellikle",forms:["in particular","particularly","especially","notably","specifically"],pat:"cümle , particularly + öge",
+  ex:{en:"The reforms affected rural provinces, {{particularly}} those in the south-east.",tr:"Reformlar kırsal illeri, özellikle güneydoğudakileri etkiledi."},
+  note:"Bütün içinden bir parçayı öne çıkarır; örnek vermez, vurgular."},
+ {ty:"zarf",mean:"diğer bir deyişle, yani",forms:["that is","namely","in other words"],pat:"cümle , namely , açıklama",
+  ex:{en:"Only one group improved, {{namely}} those who trained every single day.",tr:"Yalnızca bir grup gelişme gösterdi, yani her gün çalışanlar."},
+  note:"Söyleneni <strong>yeniden ifade eder</strong>, yeni bilgi eklemez."},
+ {ty:"zarf",mean:"aynı şekilde, benzer biçimde",forms:["likewise","similarly","in the same way"],pat:"cümle ; similarly , cümle",
+  ex:{en:"Sales contracted across Europe; {{similarly}}, Asian markets lost ground.",tr:"Satışlar Avrupa genelinde daraldı; benzer biçimde Asya pazarları da geriledi."},
+  note:"İki olgunun <strong>aynı yönde</strong> davrandığını söyler; zıtlık bildirmez."},
+ {ty:"zarf",mean:"aslında, hatta",forms:["in fact","indeed","actually","as a matter of fact"],pat:"cümle ; in fact , cümle",
+  ex:{en:"The method is far from outdated; {{in fact}}, it is more accurate than its successors.",tr:"Yöntem modası geçmiş olmaktan uzak; aslında ardıllarından daha isabetli."},
+  note:"Ya bir yanlış izlenimi düzeltir ya da söyleneni <strong>bir basamak yukarı</strong> çıkarır."},
+ {ty:"zarf",mean:"kısaca, özet olarak",forms:["in short","in brief","in summary","in conclusion","to sum up","all in all"],pat:"In short , cümle",
+  ex:{en:"{{In short}}, the policy achieved almost none of its stated aims.",tr:"Kısacası politika, beyan edilen amaçlarının neredeyse hiçbirine ulaşamadı."},
+  note:"Paragraf sonu kelimeleridir; okuma sorularında “sonuç cümlesi” işaretidir."}
+]},
+
+{id:"konu",name:"Konu belirtme",gl:"-e gelince, ile ilgili",groups:[
+ {ty:"edat",mean:"-e gelince",forms:["as for","when it comes to","with regard to","with respect to","in the case of"],pat:"As for + isim , cümle",
+  ex:{en:"{{As for}} the financial details, they remain strictly confidential.",tr:"Mali ayrıntılara gelince, onlar kesinlikle gizli kalıyor."},
+  note:"Konuyu <strong>değiştirir</strong>: “ona geldik, şimdi şuna bakalım”. Ardından isim gelir."},
+ {ty:"edat",mean:"ile ilgili, hakkında",forms:["regarding","concerning","as to","as regards","pertaining to"],pat:"regarding + isim",
+  ex:{en:"The committee issued a short statement {{regarding}} the allegations.",tr:"Komite, iddialarla ilgili kısa bir açıklama yayımladı."},
+  note:"<strong>about</strong>'un resmî karşılıklarıdır; hepsi isim alır."}
+]},
+
+{id:"haric",name:"Hariç tutma",gl:"-den başka, hariç",groups:[
+ {ty:"baglac",sn:"haric",mean:"... olması dışında",forms:["except that","save that"],pat:"cümle , except that + özne + fiil",
+  ex:{en:"The two editions are identical, {{except that}} the second includes a full index.",tr:"İki baskı, ikincisinde tam bir dizin bulunması dışında aynıdır."},
+  note:"Tek istisnayı bir <strong>cümleyle</strong> anlatır. İsimle anlatmak için “except for” kullanılır."},
+ {ty:"edat",sn:"haric",mean:"-den başka, hariç",forms:["except for","except","apart from","saving"],pat:"Except for + isim",
+  ex:{en:"{{Except for}} a handful of typographical errors, the text is flawless.",tr:"Birkaç dizgi hatası dışında metin kusursuz."},
+  note:"<strong>apart from</strong> iki yönlüdür: hem “hariç” hem “yanı sıra” olabilir, cümleden anlaşılır."}
+]},
+
+{id:"arac",name:"Araç, yerine, bakılmaksızın",gl:"aracılığıyla, -den ziyade",groups:[
+ {ty:"edat",mean:"aracılığıyla, -nin yardımıyla",forms:["by means of","via","through","with the help of"],pat:"by means of + isim",
+  ex:{en:"The samples were transported {{via}} an unrefrigerated lorry.",tr:"Örnekler soğutmasız bir kamyonla taşındı."},
+  note:"Yöntem veya kanal bildirir. <strong>by</strong> tek başına V-ing de alır: by adding salt."},
+ {ty:"edat",mean:"-e bakılmaksızın",forms:["regardless of","irrespective of"],pat:"regardless of + isim",
+  ex:{en:"The new rule applies to every employee, {{regardless of}} rank or seniority.",tr:"Yeni kural, rütbe veya kıdeme bakılmaksızın her çalışana uygulanır."},
+  note:"Bir etkenin sonucu <strong>değiştirmediğini</strong> söyler. Cümle bağlamak için “no matter what” gerekir."},
+ {ty:"edat",sn:"yerine",mean:"-den ziyade, -nin yerine",forms:["rather than","instead of","in place of"],pat:"rather than + isim / V-ing",
+  ex:{en:"The decline reflects falling demand {{rather than}} rising production costs.",tr:"Düşüş, artan üretim maliyetlerinden ziyade azalan talebi yansıtıyor."},
+  note:"İki seçenekten birini eleyip diğerini koyar. Ardından isim veya V-ing gelir."},
+ {ty:"zarf",sn:"yerine",mean:"onun yerine, daha ziyade",forms:["instead","rather"],pat:"cümle . Instead , cümle",
+  ex:{en:"The original design was dropped; {{instead}}, a far cheaper model was adopted.",tr:"Özgün tasarımdan vazgeçildi; onun yerine çok daha ucuz bir model benimsendi."},
+  note:"TUZAK: <strong>instead</strong> (cümle zarfı) tek başına durur, <strong>instead of</strong> (edat) isim ister."}
+]}
+];
+
+/* ---- türetilmiş veri ---- */
+FAM.forEach(f=>f.groups.forEach((g,i)=>{g.id=f.id+"-"+i;g.fam=f;}));
+const GR=FAM.flatMap(f=>f.groups);
+const FORMS=GR.flatMap(g=>g.forms.map(f=>({f,g})));
+const KEY="baglac-haritasi-v1";
+let star={};
+try{star=JSON.parse(localStorage.getItem(KEY)||"{}")||{}}catch(e){star={}}
+const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(star))}catch(e){}};
+
+const TABS=[{id:"harita",t:"Harita"},{id:"alistirma",t:"Alıştırma"},{id:"zor",t:"Zorlarım"}];
+let tab="harita", fFilter="all", quiz=null;
+
+const esc=s=>String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+const mark=s=>esc(s).replace(/\{\{(.+?)\}\}/g,"<b>$1</b>");
+const bare=s=>s.replace(/\{\{(.+?)\}\}/g,"$1");
+const hit=s=>(s.match(/\{\{(.+?)\}\}/)||[,""])[1];
+const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=0|Math.random()*(i+1);[a[i],a[j]]=[a[j],a[i]]}return a};
+const pick=(a,n)=>shuffle(a).slice(0,n);
+const cap=(s,like)=>/^[A-Z]/.test(like)?s.charAt(0).toUpperCase()+s.slice(1):s.charAt(0).toLowerCase()+s.slice(1);
+const safe=f=>!AMBIG.has(f.toLowerCase());
+
+/* ---- iskelet ---- */
+function chrome(){
+  document.getElementById("tabs").innerHTML=TABS.map(t=>
+    `<button class="tab" role="tab" data-tab="${t.id}" aria-selected="${t.id===tab}">${t.t}</button>`).join("");
+  const s=Object.keys(star).filter(k=>star[k]).length;
+  document.getElementById("count").textContent=`${FORMS.length} yapı · ${FAM.length} anlam ailesi · ${s} işaretli`;
+}
+
+/* ---- harita ---- */
+function card(g){
+  const st=!!star[g.id];
+  return `<article class="g k-${g.ty} ${st?"starred":""}">
+    <div class="g-top"><span class="t t-${g.ty}">${T[g.ty].lb}</span>
+      <button class="star" data-star="${g.id}" aria-pressed="${st}" title="Zor olarak işaretle">★</button></div>
+    ${g.ttl?`<div class="ttl">${esc(g.ttl)}</div>`:""}
+    ${(!g.ttl||g.forms.length>1)?`<div class="forms">${g.forms.map(f=>`<span class="f">${esc(f)}</span>`).join("")}</div>`:""}
+    <div class="mean">${esc(g.mean)}</div>
+    <div class="pat">${esc(g.pat)}</div>
+    <div class="ex"><div class="en">${mark(g.ex.en)}</div><div class="tn">${esc(g.ex.tr)}</div></div>
+    <div class="note">${g.note}</div>
+  </article>`;
+}
+function viewHarita(){
+  const fams=fFilter==="all"?FAM:FAM.filter(f=>f.id===fFilter);
+  return `<div class="rules">
+    <h2>Tek soru her şeyi çözer: arkasında ne var?</h2>
+    <p class="sub">Bu konuda anlamı bilmek yetmez. Sınav, yapının <b>ardından ne gelebildiğini</b> sorar.</p>
+    <div class="rul">
+      <div class="q">Özne + fiil</div><div class="a"><div class="line"><span class="arrow">→</span><span class="t t-baglac">Bağlaç</span></div><code>Although it rained, we went out.</code></div>
+      <div class="q">İsim / V-ing</div><div class="a"><div class="line"><span class="arrow">→</span><span class="t t-edat">Edat</span></div><code>Despite the rain, we went out.</code></div>
+      <div class="q">Ayrı cümle</div><div class="a"><div class="line"><span class="arrow">→</span><span class="t t-zarf">Cümle zarfı</span></div><code>It rained; however, we went out.</code></div>
+      <div class="q">İki parça</div><div class="a"><div class="line"><span class="arrow">→</span><span class="t t-ikili">İkili yapı</span></div><code>not only ... but also ...</code></div>
+    </div></div>
+  <div class="filters">
+    <button class="fchip" data-f="all" aria-pressed="${fFilter==="all"}">Tümü</button>
+    ${FAM.map(f=>`<button class="fchip" data-f="${f.id}" aria-pressed="${fFilter===f.id}">${esc(f.name)}</button>`).join("")}
+  </div>
+  ${fams.map(f=>`<section class="fam">
+    <div class="fam-hd"><h3>${esc(f.name)}</h3><span class="gl">${esc(f.gl)}</span></div>
+    <div class="grid">${f.groups.map(card).join("")}</div></section>`).join("")}`;
+}
+function viewZor(){
+  const gs=GR.filter(g=>star[g.id]);
+  if(!gs.length) return `<div class="empty">Henüz işaret yok. Haritada zorlandığın kartların sağ üstündeki ★ düğmesine bas; burada toplansınlar ve sadece onlardan alıştırma çözebil.</div>`;
+  return `<div class="sect"><p class="lead">${gs.length} yapı işaretli. Alıştırma sekmesinde “sadece işaretlilerden” seçeneğini kullanabilirsin.</p>
+    <div class="grid">${gs.map(card).join("")}</div></div>`;
+}
+
+/* ---- soru üretimi ---- */
+function poolForms(exclFam,ty){
+  return FORMS.filter(x=>x.g.fam.id!==exclFam.id&&safe(x.f)&&(!ty||x.g.ty===ty)).map(x=>x.f);
+}
+function qTur(src){
+  const {f,g}=src;
+  const opts=shuffle(Object.keys(T).map(k=>T[k].lb));
+  return {kind:"Tür",text:`<span class="hi">${esc(f)}</span> hangi türdendir?`,opts,ans:T[g.ty].lb,g,f};
+}
+function qDonusum(src){
+  const {f,g}=src, fam=g.fam;
+  if(!g.sn) return null;
+  /* yalnızca aynı anlam etiketini (sn) taşıyan gruplar arasında dönüşüm sorulur */
+  const others=fam.groups.filter(x=>x.sn===g.sn&&x.ty!==g.ty);
+  if(!others.length) return null;
+  const to=pick(others,1)[0];
+  const ans=pick(to.forms.filter(safe),1)[0];
+  if(!ans) return null;
+  const d=pick([...new Set(poolForms(fam,to.ty))],3);
+  if(d.length<3) return null;
+  return {kind:"Dönüşüm",text:`<span class="hi">${esc(f)}</span> bir <b>${T[g.ty].lb.toLowerCase()}</b>: ardından ${esc(T[g.ty].pat)} gelir.<br>Aynı cümleyi <b>${T[to.ty].lb.toLowerCase()}</b> ile kurmak istesen (“${esc(to.mean)}”) hangisini kullanırsın?`,
+   opts:shuffle([ans,...d]),ans,g:to,f:ans,from:g};
+}
+function qBosluk(g){
+  const a=hit(g.ex.en); if(!a) return null;
+  const banned=new Set(g.fam.groups.flatMap(x=>x.forms.map(s=>s.toLowerCase())));
+  const same=g.fam.groups.filter(x=>x.ty!==g.ty).flatMap(x=>x.forms).filter(safe);
+  const out=FORMS.filter(x=>x.g.fam.id!==g.fam.id&&safe(x.f)&&!banned.has(x.f.toLowerCase())).map(x=>x.f);
+  let d=[...pick(same,1),...pick([...new Set(out)],3)];
+  d=[...new Set(d.map(s=>s.toLowerCase()))].map(s=>out.concat(same).find(o=>o.toLowerCase()===s)).slice(0,3);
+  if(d.length<3) return null;
+  const opts=shuffle([a,...d.map(x=>cap(x,a))]);
+  return {kind:"Boşluk doldurma",text:esc(g.ex.en).replace(/\{\{.+?\}\}/,'<span class="blank">______</span>'),opts,ans:a,g,f:a,tr:g.ex.tr};
+}
+function build(kind,n,onlyStar){
+  let src=FORMS, grps=GR;
+  if(onlyStar){src=FORMS.filter(x=>star[x.g.id]);grps=GR.filter(g=>star[g.id]);}
+  if(!src.length) return null;
+  const mk=f=>a=>{const o=[];a.forEach(x=>{const q=f(x);if(q)o.push(q)});return o};
+  const bucket={tur:mk(qTur)(src),donusum:mk(qDonusum)(src),bosluk:mk(qBosluk)(grps)};
+  let qs;
+  if(kind==="karisik"){
+    /* üç soru tipinden eşit pay al, eksik kalanı diğerlerinden tamamla */
+    const keys=["bosluk","donusum","tur"], share=Math.ceil(n/3);
+    qs=keys.flatMap(k=>pick(bucket[k],share));
+    if(qs.length<n) qs=qs.concat(shuffle(keys.flatMap(k=>bucket[k])).filter(q=>!qs.includes(q)));
+  } else qs=bucket[kind]||[];
+  if(!qs.length) return null;
+  return {qs:shuffle(qs).slice(0,n),i:0,score:0,miss:[],sel:null};
+}
+
+/* ---- alıştırma ---- */
+const KINDS=[{k:"bosluk",t:"Boşluk doldurma",d:"Gerçek sınav sorusu. Cümleye hangi yapının uyduğunu bul."},
+ {k:"tur",t:"Tür tanıma",d:"Bağlaç mı, edat mı, cümle zarfı mı? En hızlı kazanç burada."},
+ {k:"donusum",t:"Tür dönüşümü",d:"“although” bağlacının edat karşılığı ne? Asıl sınanan beceri."},
+ {k:"karisik",t:"Karışık",d:"Üç tip soru birlikte gelir."}];
+let onlyStar=false;
+function viewAl(){
+  if(!quiz){
+    const sc=Object.keys(star).filter(k=>star[k]).length;
+    return `<div class="sect">
+      <p class="lead">Sorular haritadaki ${FORMS.length} yapıdan otomatik üretilir; her yanıttan sonra kuralı ve örneği birlikte görürsün.</p>
+      <div class="bar"><button class="btn ${onlyStar?"go":""}" id="os" aria-pressed="${onlyStar}">${onlyStar?"✓ ":""}Sadece işaretlediklerim (${sc})</button></div>
+      <div class="picks">${KINDS.map(k=>`<button class="pick" data-k="${k.k}"><b>${k.t}</b><span>${k.d}</span></button>`).join("")}</div>
+      <div class="bar" style="margin:16px 0 0"><span class="num">Soru sayısı</span>
+        <button class="btn" data-n="10" aria-pressed="${N===10}">10</button>
+        <button class="btn" data-n="20" aria-pressed="${N===20}">20</button>
+        <button class="btn" data-n="40" aria-pressed="${N===40}">40</button>
+        <span class="num">seçili: ${N}</span></div></div>`;
+  }
+  if(quiz.i>=quiz.qs.length){
+    const p=Math.round(quiz.score/quiz.qs.length*100);
+    const ids=[...new Set(quiz.miss)];
+    return `<div class="sect"><div class="score">
+      <div class="n">${quiz.score}/${quiz.qs.length}</div>
+      <p class="lead" style="margin:9px auto 0">%${p} doğru</p>
+      ${ids.length?`<div class="missed">${ids.map(id=>{const g=GR.find(x=>x.id===id);
+        return `<div class="mrow"><b>${esc(g.ttl||g.forms[0])}</b><span>${esc(g.fam.name)} · ${T[g.ty].lb}</span></div>`}).join("")}</div>
+      <div class="bar" style="margin-top:17px;justify-content:center"><button class="btn" id="markmiss">Yanlışları ★ işaretle</button><button class="btn go" id="again">Yeniden</button></div>`
+      :`<div class="bar" style="margin-top:15px;justify-content:center"><button class="btn go" id="again">Yeniden</button></div>`}
+    </div></div>`;
+  }
+  const q=quiz.qs[quiz.i], s=quiz.sel, g=q.g;
+  return `<div class="sect">
+    <div class="bar"><span class="num">Soru ${quiz.i+1} / ${quiz.qs.length}</span>
+      <span class="num" style="margin-left:auto">Doğru ${quiz.score}</span>
+      <button class="btn" id="quit">Bitir</button></div>
+    <div class="q">
+      <div class="qk">${q.kind}</div>
+      <div class="qt">${q.text}</div>
+      <div class="opts">${q.opts.map((o,k)=>{
+        let c="";
+        if(s!==null){ if(o===q.ans)c=" right"; else if(o===s)c=" wrong"; }
+        return `<button class="o${c}" data-o="${esc(o)}" ${s!==null?"disabled":""}><span class="k">${"ABCD"[k]}</span><span>${esc(o)}</span></button>`}).join("")}</div>
+      ${s!==null?`<div class="fb">
+        <div class="vd ${s===q.ans?"r":"w"}">${s===q.ans?"Doğru":"Yanlış — doğrusu: "+esc(q.ans)}</div>
+        <div><span class="t t-${g.ty}">${T[g.ty].lb}</span> <span class="num">${esc(T[g.ty].pat)}</span></div>
+        <div class="pat">${esc(g.pat)}</div>
+        <div class="ex"><div class="en">${mark(g.ex.en)}</div><div class="tn">${esc(g.ex.tr)}</div></div>
+        <div class="note">${g.note}</div>
+        <div class="bar" style="margin:4px 0 0"><button class="btn go" id="nq">${quiz.i===quiz.qs.length-1?"Sonucu gör":"Sonraki"}</button>
+        <button class="btn" data-star="${g.id}" aria-pressed="${!!star[g.id]}">${star[g.id]?"★ işaretli":"★ zor"}</button></div>
+      </div>`:""}
+    </div></div>`;
+}
+let N=20;
+
+function render(){
+  chrome();
+  document.getElementById("view").innerHTML = tab==="harita"?viewHarita() : tab==="zor"?viewZor() : viewAl();
+  window.scrollTo({top:0,behavior:"instant"});
+}
+document.addEventListener("click",e=>{
+  const t=e.target.closest("button"); if(!t) return;
+  if(t.dataset.tab){tab=t.dataset.tab;quiz=null;render();return}
+  if(t.dataset.f){fFilter=t.dataset.f;render();return}
+  if(t.dataset.star){const id=t.dataset.star;star[id]=!star[id];if(!star[id])delete star[id];save();render();return}
+  if(t.id==="os"){onlyStar=!onlyStar;render();return}
+  if(t.dataset.n){N=+t.dataset.n;render();return}
+  if(t.dataset.k){
+    const q=build(t.dataset.k,N,onlyStar);
+    if(!q){document.getElementById("view").insertAdjacentHTML("afterbegin",`<div class="empty">Bu seçimle soru üretilemedi — işaretli yapı sayısı çok az. Daha fazla yapı işaretle ya da filtreyi kaldır.</div>`);return}
+    quiz=q;render();return}
+  if(t.dataset.o!==undefined&&quiz&&quiz.sel===null){
+    const q=quiz.qs[quiz.i]; quiz.sel=t.dataset.o;
+    if(quiz.sel===q.ans)quiz.score++; else quiz.miss.push(q.g.id);
+    render();return}
+  if(t.id==="nq"){quiz.i++;quiz.sel=null;render();return}
+  if(t.id==="again"||t.id==="quit"){quiz=null;render();return}
+  if(t.id==="markmiss"){[...new Set(quiz.miss)].forEach(id=>star[id]=true);save();quiz=null;render();return}
+});
+render();
+</script>
+
+</body></html>
